@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use backend\models\Apple;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -30,6 +31,10 @@ class SiteController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                     ],
+	                [
+		                'allow' => true,
+		                'roles' => ['@'],
+	                ],
                 ],
             ],
             'verbs' => [
@@ -58,10 +63,36 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
-    {
-        return $this->render('index');
-    }
+	public function actionIndex() {
+		$apple_model = new Apple();
+		$apples_on_tree = $apple_model->on_tree();
+		$apples_fell = $apple_model->fell();
+		if (Yii::$app->request->post('generate')) {
+			$apple_model->generate();
+			$this->redirect(Yii::$app->request->referrer);
+		}
+		return $this->render('index', [
+			'apples_on_tree' => $apples_on_tree,
+			'apples_fell' => $apples_fell
+		]);
+	}
+    
+	public function actionFallAppleToGround() {
+		if (!Yii::$app->request->isAjax) {
+			Yii::$app->end();
+		}
+		Yii::$app->response->format = 'json';
+		$response = ['message' => 'apple_not_fell', 'success' => false];
+		$apple_id = strip_tags((int)Yii::$app->request->get('id'));
+		if (empty($apple_id)) {return false;}
+		$apple_model = new Apple();
+		$fell = $apple_model->fallToGround($apple_id);
+		if ($fell) {
+			$response['success'] = true;
+			$response['message'] = 'apple_successfully_fell';
+		}
+		return $response;
+	}
 
     /**
      * Login action.
