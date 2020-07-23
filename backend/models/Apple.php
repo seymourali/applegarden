@@ -5,10 +5,15 @@
 	
 	class Apple
 	{
-		public $colors = ['green', 'red', 'yellow'];
+		public $colors = ['#52c652', '#a1181f', '#e7e744'];
 		
-		public function on_tree() {
-			return Yii::$app->db->createCommand('SELECT * FROM apples WHERE status=0')->queryAll();
+		public function on_tree($apple_ids = []) {
+			if (empty($apple_ids)) {
+				return Yii::$app->db->createCommand('SELECT * FROM apples WHERE status=0 ORDER BY id ASC')->queryAll();
+			} else {
+				$ids_str = implode(', ', $apple_ids);
+				return Yii::$app->db->createCommand("SELECT * FROM apples WHERE status=0 AND id IN ({$ids_str}) ORDER BY id ASC")->queryAll();
+			}
 		}
 		
 		public function fell() {
@@ -17,19 +22,21 @@
 		
 		public function generate() {
 			$count = rand(1, 3);
-			if (!empty($count)) {
-				$i = 1;
-				while($i <= $count) {
-					$color_index = array_rand($this->colors);
-					$color = $this->colors[$color_index];
-					Yii::$app->db->createCommand()->insert('apples', [
-						'color' => $color,
-						'size' => 1,
-						'create_datetime' => date('Y-m-d H:i:s')
-					])->execute();
-					$i++;
-				}
+			if (empty($count)) {return false;}
+			$generated = [];
+			$i = 1;
+			while($i <= $count) {
+				$color_index = array_rand($this->colors);
+				$color = $this->colors[$color_index];
+				Yii::$app->db->createCommand()->insert('apples', [
+					'color' => $color,
+					'size' => 1,
+					'create_datetime' => date('Y-m-d H:i:s')
+				])->execute();
+				$i++;
+				$generated[] = Yii::$app->db->getLastInsertID();
 			}
+			return $generated;
 		}
 		
 		public function fallToGround($apple_id) {
