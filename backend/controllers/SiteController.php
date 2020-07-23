@@ -88,10 +88,10 @@ class SiteController extends Controller
 		$apple_model = new Apple();
 		$fell = $apple_model->fallToGround($apple_id);
 		if ($fell) {
+			$apple = $apple_model->get($apple_id);
 			$response['success'] = true;
 			$response['message'] = 'apple_successfully_fell';
-			$apples_fell = $apple_model->fell();
-			$response['data'] = ['fell' => $apples_fell];
+			$response['data'] = $apple;
 		}
 		return $response;
 	}
@@ -118,7 +118,7 @@ class SiteController extends Controller
 				$response = [
 					'success' => true,
 					'message' => 'apple_was_eaten_partially_successfully',
-					'data' => $apple['size']
+					'data' => $apple
 				];
 			}
 		}
