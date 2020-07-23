@@ -103,6 +103,11 @@ class SiteController extends Controller
 		$apple_id = strip_tags((int)Yii::$app->request->get('id'));
 		if (empty($apple_id)) {return false;}
 		$apple_model = new Apple();
+		if ((int)$apple_model->fell_count()>=36) {
+			$response['success'] = false;
+			$response['message'] = 'Too many apples. Time to eat';
+			return $response;
+		}
 		$fell = $apple_model->fallToGround($apple_id);
 		if ($fell) {
 			$apple = $apple_model->get($apple_id);

@@ -39,6 +39,10 @@
 			return $generated;
 		}
 		
+		public function fell_count() {
+			return Yii::$app->db->createCommand('SELECT COUNT(id) FROM apples WHERE status=1')->queryScalar();
+		}
+		
 		public function fallToGround($apple_id) {
 			if (empty($apple_id)) {return false;}
 			return Yii::$app->db->createCommand('UPDATE apples SET status=1, fall_datetime=:datetime WHERE id=:id', [':id' => $apple_id, ':datetime' => date('Y-m-d H:i:s')])->execute();
