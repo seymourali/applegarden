@@ -90,6 +90,37 @@ class SiteController extends Controller
 		if ($fell) {
 			$response['success'] = true;
 			$response['message'] = 'apple_successfully_fell';
+			$apples_fell = $apple_model->fell();
+			$response['data'] = ['fell' => $apples_fell];
+		}
+		return $response;
+	}
+	
+	public function actionEatApple() {
+		if (!Yii::$app->request->isAjax) {
+			Yii::$app->end();
+		}
+		Yii::$app->response->format = 'json';
+		$response = ['message' => 'apple_not_eaten', 'success' => false];
+		$post_data = Yii::$app->request->post();
+		$apple_id = strip_tags((int)$post_data['id']);
+		$eaten_percent = strip_tags($post_data['percent']);
+		$apple_model = new Apple();
+		$eaten = $apple_model->eat($apple_id, $eaten_percent);
+		if ($eaten) {
+			$apple = $apple_model->get($apple_id);
+			if (empty($apple)) {
+				$response = [
+					'success' => true,
+					'message' => 'apple_was_eaten_completely_successfully',
+				];
+			} else {
+				$response = [
+					'success' => true,
+					'message' => 'apple_was_eaten_partially_successfully',
+					'data' => $apple['size']
+				];
+			}
 		}
 		return $response;
 	}
