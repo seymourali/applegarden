@@ -125,6 +125,10 @@ a.desc:after {
     transform: rotate(-45deg);
 }
 
+.tree {
+    z-index: 1;
+}
+
 .onTree:hover {
     /*background-color: red;*/
 }
@@ -142,6 +146,7 @@ a.desc:after {
     align-items: flex-end;
     padding: 75px 100px 0 100px;
     width: 80%;
+    flex-direction: column;
 }
 
 .apple-container {
@@ -170,6 +175,7 @@ div.callout {
     left: -127px;
     top: -95px;
     width: 150px;
+    z-index: 2;
 }
 
 .callout::before {
