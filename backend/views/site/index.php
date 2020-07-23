@@ -109,6 +109,12 @@ $this->title = 'My Yii Application'; ?>
             }
             return svg;
         }
+
+        $(document).on('click', function (e) {
+            if ($(e.target).closest(".callout").length === 0) {
+                $(".callout").hide();
+            }
+        });
         
         $(document).ready(function () {
             
@@ -119,7 +125,8 @@ $this->title = 'My Yii Application'; ?>
                 });
             });
 
-            $('body').on('click', '.onTree', function () {
+            $('body').on('click', '.onTree', function (e) {
+                e.stopPropagation();
                 let apple = $(this);
                 let appleId = apple.data('id');
                 if (!appleId) {return false;}
@@ -161,14 +168,16 @@ $this->title = 'My Yii Application'; ?>
                 })
             });
             
-            $('body').on('click', '.fell', function () {
+            $('body').on('click', '.fell', function (e) {
+                e.stopPropagation();
                 let apple = $(this);
                 let percentBox = apple.parent().find('.callout');
                 $('.callout').hide();
                 percentBox.show();
             });
             
-            $('body').on('click', '.eat', function () {
+            $('body').on('click', '.eat', function (e) {
+                e.stopPropagation();
                 let apple = $(this);
                 let appleContainer = apple.closest('.apple-container');
                 let appleId = apple.data('id');
@@ -202,7 +211,8 @@ $this->title = 'My Yii Application'; ?>
                 });
             });
             
-            $('.generate').on('click', function () {
+            $('.generate').on('click', function (e) {
+                e.stopPropagation();
                 let url = homeUrl + "/site/generate";
                 $.ajax({
                     type: 'GET',
