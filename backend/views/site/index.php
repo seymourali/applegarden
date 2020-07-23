@@ -25,7 +25,7 @@ $this->title = 'My Yii Application'; ?>
         $form = ActiveForm::begin(); ?>
         <div class="body-content">
             <div class="row">
-                <div style="position: absolute; left: 85px;z-index: 1;">
+                <div style="position: absolute;z-index: 1;">
                     <button type="button" title="Generate apples" class="btn btn-lg btn-default generate">Watering
                         <img src="<?=Yii::$app->homeUrl. '/img/plant.png';?>" alt="" />
                     </button>
@@ -44,29 +44,37 @@ $this->title = 'My Yii Application'; ?>
                     </div>
 
                     <div class="ground">
-                        <div class="row">
-                            <?php foreach ($apples_fell as $apple) { ?>
-                                <div class="col-md-1 apple-container">
-                                    <?php if (time() - strtotime($apple['fall_datetime']) > 5*3600) { ?>
-                                        <div title="Rotten">
-                                            <svg class="apple" style="fill:<?=$apple['color'];?>">
-                                                <use xlink:href="<?= Yii::$app->homeUrl . '/svg/' . get_image($apple['size']); ?>#Capa_1"></use>
-                                            </svg>
-                                        </div>
-                                    <?php } else { ?>
-                                        <div class="callout top-right">
-                                            <div style="display: flex;justify-content: space-between;">
-                                                <input type="number" class="form-control percent" max="100" style="width: 70px;" value="<?= (100 - round($apple['size'] * 100)) ?>"/>
-                                                <span style="padding-top: 5px;">%</span>
-                                                <button type="button" class="btn btn-default eat"
-                                                        data-id="<?= $apple['id'] ?>"><i class="fa fa-cutlery" aria-hidden="true" style="height: 34px;"></i> Eat
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="fell" title="Click to eat">
-                                            <svg class="apple"  style="fill:<?=$apple['color'];?>">
-                                                <use xlink:href="<?= Yii::$app->homeUrl . '/svg/' . get_image($apple['size']); ?>#Capa_1"></use>
-                                            </svg>
+                        <div class="row" style="width: 100%;margin-left: 3px;">
+                            <?php foreach ($apples_fell_chunk as $k => $apples_fell) {
+                                $target_box = '';
+                                if ($k===0) {$target_box='bottom';}
+                                if ($k===1) {$target_box='middle';}
+                                if ($k===2) {$target_box='upper';} ?>
+                                <div data-position="<?=$target_box;?>">
+                                    <?php foreach ($apples_fell as $apple) { ?>
+                                        <div class="apple-container">
+                                            <?php if (time() - strtotime($apple['fall_datetime']) > 5*3600) { ?>
+                                                <div title="Rotten">
+                                                    <svg class="apple" style="fill:<?=$apple['color'];?>">
+                                                        <use xlink:href="<?= Yii::$app->homeUrl . '/svg/' . get_image($apple['size']); ?>#Capa_1"></use>
+                                                    </svg>
+                                                </div>
+                                            <?php } else { ?>
+                                                <div class="callout top-right">
+                                                    <div style="display: flex;justify-content: space-between;">
+                                                        <input type="number" class="form-control percent" max="100" style="width: 70px;" value="<?= (100 - round($apple['size'] * 100)) ?>"/>
+                                                        <span style="padding-top: 5px;">%</span>
+                                                        <button type="button" class="btn btn-default eat"
+                                                                data-id="<?= $apple['id'] ?>"><i class="fa fa-cutlery" aria-hidden="true" style="height: 34px;"></i> Eat
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="fell" title="Click to eat">
+                                                    <svg class="apple"  style="fill:<?=$apple['color'];?>">
+                                                        <use xlink:href="<?= Yii::$app->homeUrl . '/svg/' . get_image($apple['size']); ?>#Capa_1"></use>
+                                                    </svg>
+                                                </div>
+                                            <?php } ?>
                                         </div>
                                     <?php } ?>
                                 </div>
@@ -123,10 +131,19 @@ $this->title = 'My Yii Application'; ?>
                     dataType: 'json',
                     success: function(response) {
                         if (response.success) {
-                            let appleFell = response.data;
+                            let appleFell = response.data.apple;
+                            let targetBox = '',
+                                fellCount = parseInt(response.data.fell_count);
+                            if (fellCount<=15) {
+                                targetBox = 'bottom';
+                            } else if (fellCount<=30) {
+                                targetBox = 'middle';
+                            } else if (fellCount<=45) {
+                                targetBox = 'upper';
+                            }
                             apple.remove();
-                            $(".ground .row").append(
-                            '<div class="col-md-1 apple-container">' +
+                            $(".ground .row div[data-position='" + targetBox +"']").append(
+                            '<div class="apple-container">' +
                                 '<div class="callout top-right">' +
                                     '<div style="display: flex;justify-content: space-between;">' +
                                         '<input type="number" class="form-control percent" max="100" style="width: 70px;" />' +

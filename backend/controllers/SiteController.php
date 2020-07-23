@@ -69,7 +69,7 @@ class SiteController extends Controller
 		$apples_fell = $apple_model->fell();
 		return $this->render('index', [
 			'apples_on_tree' => $apples_on_tree,
-			'apples_fell' => $apples_fell
+			'apples_fell_chunk' => array_chunk($apples_fell, 15)
 		]);
 	}
 	
@@ -103,7 +103,8 @@ class SiteController extends Controller
 		$apple_id = strip_tags((int)Yii::$app->request->get('id'));
 		if (empty($apple_id)) {return false;}
 		$apple_model = new Apple();
-		if ((int)$apple_model->fell_count()>=36) {
+		$apple_fell_count = (int)$apple_model->fell_count();
+		if ($apple_fell_count>=45) {
 			$response['success'] = false;
 			$response['message'] = 'Too many apples. Time to eat';
 			return $response;
@@ -113,7 +114,10 @@ class SiteController extends Controller
 			$apple = $apple_model->get($apple_id);
 			$response['success'] = true;
 			$response['message'] = 'apple_successfully_fell';
-			$response['data'] = $apple;
+			$response['data'] = [
+				'apple' => $apple,
+				'fell_count' => $apple_fell_count
+			];
 		}
 		return $response;
 	}

@@ -139,11 +139,32 @@ a.desc:after {
     cursor: pointer;
 }
 
+.ground .row [data-position='bottom'] {
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    width: 100%;
+}
+.ground .row [data-position='middle'] {
+    position: absolute;
+    bottom: 40px;
+    display: flex;
+    width: 100%;
+}
+
+.ground .row [data-position='upper'] {
+    position: absolute;
+    bottom: 80px;
+    display: flex;
+    width: 100%;
+}
+
+
 .ground {
     position: absolute;
     bottom: -5px;
     display:flex;
-    align-items: flex-end;
+    /*align-items: flex-end;*/
     padding: 75px 100px 0 100px;
     width: 80%;
     flex-direction: column;
@@ -154,7 +175,7 @@ a.desc:after {
     flex-direction: column;
     justify-content: center;
     position: relative;
-    margin-top: 5px;
+    margin-right: 20px;
 }
 
 div.callout {
