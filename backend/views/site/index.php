@@ -10,11 +10,11 @@ $this->title = 'My Yii Application'; ?>
             $size = (float)$size;
             $size = 1-$size;
             $svg = '';
-	        if ($size>0.01 && $size<0.25) {
+	        if ($size>0.01 && $size<=0.25) {
 		       $svg = '25.svg';
-	        } else if ($size>0.25 && $size<0.5) {
+	        } else if ($size>0.25 && $size<=0.5) {
 		        $svg =  '50.svg';
-	        } else if ($size>0.5 && $size<0.75) {
+	        } else if ($size>0.5 && $size<=0.75) {
 		        $svg = '75.svg';
 	        } else if ($size>0.75 && $size<1) {
 		        $svg = '99.svg';
@@ -26,18 +26,21 @@ $this->title = 'My Yii Application'; ?>
         <div class="body-content">
             <div class="row">
                 <div style="position: absolute; left: 85px;z-index: 1;">
-                    <button type="submit" class="btn btn-lg btn-default" name="generate" value="1">Watering
+                    <button type="button" title="Generate apples" class="btn btn-lg btn-default generate">Watering
                         <img src="<?=Yii::$app->homeUrl. '/img/plant.png';?>" alt="" />
                     </button>
                 </div>
                 <div style="display: flex;justify-content: center;position: relative;">
                     <?= Html::img('@web/img/apple-tree.png');?>
+                    <img src="<?=Yii::$app->homeUrl. '/img/sun.png';?>" alt="" style="position: absolute;right: 100px;"/>
                     <div class="tree" style="width: 260px;height: 260px;top: 85px;display: flex;justify-content: center;position: absolute;transform: rotate(45deg);">
 	                    <?php foreach ($apples_on_tree as $apple) { ?>
-                            <svg class="apple onTree" data-id="<?=$apple['id']?>" style="fill:<?=$apple['color'];?>">
-                                <use xlink:href="<?= Yii::$app->homeUrl . '/svg/' . get_image($apple['size']); ?>#Capa_1"></use>
-                            </svg>
-	                    <?php } ?>
+                            <div title="Click to pluck from the tree">
+                                <svg class="apple onTree" data-id="<?=$apple['id']?>" style="fill:<?=$apple['color'];?>">
+                                    <use xlink:href="<?= Yii::$app->homeUrl . '/svg/' . get_image($apple['size']); ?>#Capa_1"></use>
+                                </svg>
+                            </div>
+                        <?php } ?>
                     </div>
 
                     <div class="ground">
@@ -69,6 +72,9 @@ $this->title = 'My Yii Application'; ?>
                                 </div>
                             <?php } ?>
                         </div>
+                        <div style="display: flex;justify-content: center;width: 100%;">
+                            <img src="<?= Yii::$app->homeUrl . '/img/grass.png';?>" alt="" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -82,11 +88,11 @@ $this->title = 'My Yii Application'; ?>
             if (!size) {return false;}
             size = 1-size;
             let svg = '';
-            if (size>0.01 && size<0.25) {
+            if (size>0.01 && size<=0.25) {
                 svg = homeUrl + '/svg/25.svg';
-            } else if (size>0.25 && size<0.5) {
+            } else if (size>0.25 && size<=0.5) {
                 svg = homeUrl + '/svg/50.svg';
-            } else if (size>0.5 && size<0.75) {
+            } else if (size>0.5 && size<=0.75) {
                 svg = homeUrl + '/svg/75.svg';
             } else if (size>0.75 && size<1) {
                 svg = homeUrl + '/svg/99.svg';
@@ -104,8 +110,8 @@ $this->title = 'My Yii Application'; ?>
                     top : Math.random() * ($('.tree').height() - $(this).height())
                 });
             });
-            
-            $('.onTree').on('click', function () {
+
+            $('body').on('click', '.onTree', function () {
                 let apple = $(this);
                 let appleId = apple.data('id');
                 if (!appleId) {return false;}
@@ -153,6 +159,7 @@ $this->title = 'My Yii Application'; ?>
                 let percent = apple.parent().find('.percent');
                 let percentValue = percent.val();
                 if (!appleId || !percentValue) {return false;}
+                if (parseFloat(percentValue)<=0 || parseFloat(percentValue)>100) {return false;}
                 let url = homeUrl + "/site/eat-apple";
                 $.ajax({
                     type: 'POST',
@@ -176,6 +183,31 @@ $this->title = 'My Yii Application'; ?>
                     },
                     error:function () {console.log('error');}
                 });
+            });
+            
+            $('.generate').on('click', function () {
+                let url = homeUrl + "/site/generate";
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            let generated = response.data;
+                            if (generated) {
+                                $.each(generated, function(k, v) {
+                                    $('.tree').append('<div title="Click to pluck from the tree"><svg class="apple onTree" data-id="'+v.id+'" style="fill:'+v.color+'"><use xlink:href="'+getSvg(v.size)+'#Capa_1"></use></svg></div>');
+                                    let elem = $(".onTree[data-id='" + v.id +"']");
+                                    elem.css({
+                                        left : Math.random() * ($('.tree').width() - elem.width()),
+                                        top : Math.random() * ($('.tree').height() - elem.height())
+                                    });
+                                });
+                            }
+                        }
+                    },
+                    error: function() {console.log('error');}
+                })
             });
         });
     </script>

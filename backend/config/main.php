@@ -12,10 +12,19 @@ return [
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
     'modules' => [],
+	'homeUrl' => '/admin',
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
+	        'baseUrl' => '/admin'
         ],
+	    'assetManager' => [
+		    'bundles' => [
+			    'yii\web\JqueryAsset' => [
+				    'jsOptions' => [ 'position' => \yii\web\View::POS_HEAD ],
+			    ],
+		    ],
+	    ],
         'user' => [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
@@ -37,14 +46,14 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
+        
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
+        
     ],
     'params' => $params,
 ];
