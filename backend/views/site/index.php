@@ -148,6 +148,9 @@ $this->title = 'My Yii Application'; ?>
                             } else if (fellCount<=45) {
                                 targetBox = 'upper';
                             }
+                            if ([1, 16, 31].indexOf(fellCount)!==-1) {
+                                $('.ground .row').append('<div data-position="'+targetBox+'"></div>');
+                            }
                             apple.remove();
                             $(".ground .row div[data-position='" + targetBox +"']").append(
                             '<div class="apple-container">' +

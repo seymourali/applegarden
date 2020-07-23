@@ -111,6 +111,7 @@ class SiteController extends Controller
 		}
 		$fell = $apple_model->fallToGround($apple_id);
 		if ($fell) {
+			$apple_fell_count = (int)$apple_model->fell_count();
 			$apple = $apple_model->get($apple_id);
 			$response['success'] = true;
 			$response['message'] = 'apple_successfully_fell';
