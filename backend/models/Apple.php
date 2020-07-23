@@ -12,7 +12,7 @@
 		}
 		
 		public function fell() {
-			return Yii::$app->db->createCommand('SELECT * FROM apples WHERE status=1')->queryAll();
+			return Yii::$app->db->createCommand('SELECT * FROM apples WHERE status=1 ORDER BY id ASC')->queryAll();
 		}
 		
 		public function generate() {
@@ -34,6 +34,25 @@
 		
 		public function fallToGround($apple_id) {
 			if (empty($apple_id)) {return false;}
-			return Yii::$app->db->createCommand('UPDATE apples SET status=1 WHERE id=:id', [':id' => $apple_id])->execute();
+			return Yii::$app->db->createCommand('UPDATE apples SET status=1, fall_datetime=:datetime WHERE id=:id', [':id' => $apple_id, ':datetime' => date('Y-m-d H:i:s')])->execute();
+		}
+		
+		public function eat($apple_id, $eaten_percent) {
+			if (empty($apple_id) || empty($eaten_percent)) {return false;}
+			$decimal_size = (1 - (float)$eaten_percent/100);
+			if (empty($decimal_size)) {
+				return $this->delete($apple_id);
+			}
+			return Yii::$app->db->createCommand('UPDATE apples SET size=:size WHERE id=:id', [':id' => $apple_id, ':size' => $decimal_size])->execute();
+		}
+		
+		public function delete($apple_id) {
+			if (empty($apple_id)) {return false;}
+			return Yii::$app->db->createCommand('DELETE FROM apples WHERE id=:id', [':id' => (int)$apple_id])->execute();
+		}
+		
+		public function get($apple_id) {
+			if (empty($apple_id)) {return false;}
+			return Yii::$app->db->createCommand('SELECT * FROM apples WHERE id=:id', [':id' => (int)$apple_id])->queryOne();
 		}
 	}
