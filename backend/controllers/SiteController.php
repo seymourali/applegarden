@@ -67,14 +67,31 @@ class SiteController extends Controller
 		$apple_model = new Apple();
 		$apples_on_tree = $apple_model->on_tree();
 		$apples_fell = $apple_model->fell();
-		if (Yii::$app->request->post('generate')) {
-			$apple_model->generate();
-			$this->redirect(Yii::$app->request->referrer);
-		}
 		return $this->render('index', [
 			'apples_on_tree' => $apples_on_tree,
 			'apples_fell' => $apples_fell
 		]);
+	}
+	
+	public function actionGenerate() {
+		if (!Yii::$app->request->isAjax) {
+			Yii::$app->end();
+		}
+		Yii::$app->response->format = 'json';
+		$response = ['message' => 'apples_not_generated', 'success' => false];
+		$apple_model = new Apple();
+		$generated = $apple_model->generate();
+		if ($generated) {
+			$apples_on_tree = $apple_model->on_tree($generated);
+			if (!empty($apples_on_tree)) {
+				$response = [
+					'message' => 'apples_generated_successfully',
+					'success' => true,
+					'data' => $apples_on_tree
+				];
+			}
+		}
+		return $response;
 	}
     
 	public function actionFallAppleToGround() {
@@ -105,6 +122,8 @@ class SiteController extends Controller
 		$post_data = Yii::$app->request->post();
 		$apple_id = strip_tags((int)$post_data['id']);
 		$eaten_percent = strip_tags($post_data['percent']);
+		if (empty($apple_id) || empty($eaten_percent)) {return $response;}
+		if ((float)$eaten_percent<=0 || (float)$eaten_percent>100) {return $response;}
 		$apple_model = new Apple();
 		$eaten = $apple_model->eat($apple_id, $eaten_percent);
 		if ($eaten) {
